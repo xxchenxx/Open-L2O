@@ -216,6 +216,48 @@ def rastrigin(batch_size=128, num_dims=10, alpha=10, stddev=1, dtype=tf.float32)
 
   return build
 
+def rastrigin_fixed(data_A, data_B, data_C, batch_size=128, num_dims=10, alpha=10, stddev=1, dtype=tf.float32, x_init=None):
+  
+  data_A = data_A.astype(np.float32)
+  data_B = data_B.astype(np.float32)
+  data_C = data_C.astype(np.float32)
+
+  def build():
+    """Builds loss graph."""
+    # Trainable variable.
+    
+    if x_init is not None:
+      x = tf.get_variable(
+          "x",
+          shape=[batch_size, num_dims, 1],
+          dtype=dtype,
+          initializer=tf.constant_initializer(x_init))
+    else:
+      x = tf.get_variable(
+          "x",
+          shape=[batch_size, num_dims, 1],
+          dtype=dtype,
+          initializer=tf.random_normal_initializer(stddev=stddev))
+    
+    indices = tf.get_variable("indices",
+                        shape=[batch_size],
+                        dtype=tf.int64,
+                        initializer=tf.random_uniform_initializer(0, data_A.shape[0], dtype=tf.int64),
+                        trainable=False)
+    A = tf.gather(data_A, indices)
+    B = tf.gather(data_B, indices)
+    C = tf.gather(data_C, indices)
+
+    # Non-trainable variables.
+    product = tf.matmul(A, x)
+    ras_norm=tf.norm(product-B,ord=2,axis=[-2,-1])
+    
+    cqTcos=tf.squeeze(tf.matmul(tf.transpose(C,perm=[0,2,1]),tf.cos(2*np.pi*x)))
+
+    return tf.reduce_mean(0.5*(ras_norm**2)-alpha*cqTcos+alpha*num_dims)
+
+  return build
+
 def ensemble(problems, weights=None):
   """Ensemble of problems.
 
