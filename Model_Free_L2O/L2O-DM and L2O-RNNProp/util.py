@@ -244,7 +244,47 @@ def get_config(problem_name, path=None, mode=None, num_hidden_layer=None, net_na
         "net_path": path
     }}
     net_assignments = None
-  
+  elif problem_name == "lasso-fixed-10-5":
+    data_A = np.load("/home/xuxi/Open-L2O/LASSO/5_0.005/train_Xys_10_0.005.npy")
+    problem = problems.lasso_fixed(data_A[:, :50].reshape(-1, 5, 10), data_A[:, 50:].reshape(-1, 5, 1), batch_size=128)
+
+    net_config = {"cw": {
+        "net": "CoordinateWiseDeepLSTM",
+        "net_options": {"layers": (20, 20)},
+        "net_path": path
+    }}
+    net_assignments = None
+  elif problem_name == "lasso-fixed-10-5-test":
+    data_A = np.load("/home/xuxi/Open-L2O/LASSO/5_0.005/test_Xys_10_0.005.npy")
+    x = np.load("/home/xuxi/Open-L2O/LASSO/5_0.005/initpts_lasso.npy")
+    problem = problems.lasso_fixed(data_A[:, :50].reshape(-1, 5, 10), data_A[:, 50:].reshape(-1, 5, 1), x_init=x)
+
+    net_config = {"cw": {
+        "net": "CoordinateWiseDeepLSTM",
+        "net_options": {"layers": (20, 20)},
+        "net_path": path
+    }}
+    net_assignments = None
+  elif problem_name == "lasso-fixed-50-25":
+    data_A = np.load("/home/xuxi/Open-L2O/LASSO/25_0.005/train_Xys_50_0.005_en.npy")
+    problem = problems.lasso_fixed(data_A[:, :1250].reshape(-1, 25, 50), data_A[:, 50:].reshape(-1, 25, 1), batch_size=128)
+
+    net_config = {"cw": {
+        "net": "CoordinateWiseDeepLSTM",
+        "net_options": {"layers": (20, 20)},
+        "net_path": path
+    }}
+    net_assignments = None
+  elif problem_name == "lasso-fixed-50-25-test":
+    data_A = np.load("/home/xuxi/Open-L2O/LASSO/25_0.005/test_Xys_50_0.005.npy")
+    problem = problems.lasso_fixed(data_A[:, :1250].reshape(-1, 25, 50), data_A[:, 50:].reshape(-1, 25, 1))
+
+    net_config = {"cw": {
+        "net": "CoordinateWiseDeepLSTM",
+        "net_options": {"layers": (20, 20)},
+        "net_path": path
+    }}
+    net_assignments = None
   else:
     raise ValueError("{} is not a valid problem".format(problem_name))
 

@@ -134,10 +134,10 @@ def lasso(batch_size=128, num_dims=10, stddev=0.01, l=0.005, dtype=tf.float32):
   return build
 
 
-def lasso_fixed(data_A, data_b, stddev=0.01, l=0.005, dtype=tf.float32):
+def lasso_fixed(data_A, data_b, stddev=0.01, l=0.005, dtype=tf.float32, batch_size=128, x_init=None):
   """lasso problem: f(x) = 0.5*||Wx - y||2 + lamada *||x||1."""
-  a = data_A
-  b = data_b
+  a = data_A.astype(np.float32)
+  b = data_b.astype(np.float32)
 
   print("=" * 100)
   print("LASSO: A_size={} b_size={}".format(a.shape, b.shape))
@@ -146,23 +146,27 @@ def lasso_fixed(data_A, data_b, stddev=0.01, l=0.005, dtype=tf.float32):
     """Builds loss graph."""
 
     # Trainable variable.
-    x = tf.get_variable(
-        "x",
-        shape=[a.shape[0], a.shape[2]],
-        dtype=dtype,
-        initializer=tf.random_normal_initializer(stddev=stddev))
+    if x_init is not None:
+      x = tf.get_variable(
+          "x",
+          shape=[batch_size, a.shape[2]],
+          dtype=dtype,
+          initializer=tf.constant_initializer(x_init))
+    else:
+      x = tf.get_variable(
+          "x",
+          shape=[batch_size, a.shape[2]],
+          dtype=dtype,
+          initializer=tf.random_normal_initializer(stddev=stddev))
 
     # Non-trainable variables.
-    w = tf.get_variable("w",
-                        shape=a.shape,
-                        dtype=dtype,
-                        initializer=tf.constant_initializer(a),
+    indices = tf.get_variable("indices",
+                        shape=[batch_size],
+                        dtype=tf.int64,
+                        initializer=tf.random_uniform_initializer(0, a.shape[0], dtype=tf.int64),
                         trainable=False)
-    y = tf.get_variable("y",
-                        shape=b.shape,
-                        dtype=dtype,
-                        initializer=tf.constant_initializer(b),
-                        trainable=False)
+    w = tf.gather(a, indices)
+    y = tf.gather(b, indices)
 
     # product = tf.squeeze(tf.matmul(w, tf.expand_dims(x, -1)))
     

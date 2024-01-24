@@ -176,7 +176,7 @@ def main(_):
             # Evaluation.
             if (e + 1) % FLAGS.evaluation_period == 0:
                 if FLAGS.if_cl:
-                    num_unrolls_eval_cur = num_unrolls_eval[curriculum_idx]
+                    num_unrolls_eval_cur = num_unrolls_eval[min(curriculum_idx, len(num_unrolls_eval) - 1)]
                 else:
                     num_unrolls_eval_cur = num_unrolls
                 num_eval += 1
@@ -225,7 +225,7 @@ def main(_):
                     eval_cost = 0
                     for _ in xrange(FLAGS.evaluation_epochs):
                         time, cost = util.run_epoch(sess, cost_op, [update], reset,
-                                                    num_unrolls_eval[curriculum_idx],
+                                                    num_unrolls_eval[min(curriculum_idx, len(num_unrolls_eval) - 1)],
                                                     step=seq_step,
                                                     unroll_len=FLAGS.unroll_length)
                         eval_cost += cost
