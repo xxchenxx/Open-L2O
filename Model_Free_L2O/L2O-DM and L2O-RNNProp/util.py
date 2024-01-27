@@ -286,7 +286,7 @@ def get_config(problem_name, path=None, mode=None, num_hidden_layer=None, net_na
     }}
     net_assignments = None
   elif problem_name == "rastrigin-fixed-2":
-    data_A = np.load("/home/xuxi/Open-L2O/LASSO/5_0.005/train_Xys_10_0.005.npy")
+    data_A = np.load("/home/xuxi/Open-L2O/Rastrigin/2/train_Abcs_2_10.npy")
     problem = problems.rastrigin_fixed(data_A[:, :4].reshape(-1, 2, 2), data_A[:, 4:6].reshape(-1, 2, 1), data_A[:, 6:].reshape(-1, 2, 1), batch_size=128, num_dims=2)
 
     net_config = {"cw": {
