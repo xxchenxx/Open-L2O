@@ -134,7 +134,7 @@ def lasso(batch_size=128, num_dims=10, stddev=0.01, l=0.005, dtype=tf.float32):
   return build
 
 
-def lasso_fixed(data_A, data_b, stddev=0.01, l=0.005, dtype=tf.float32, batch_size=128, x_init=None):
+def lasso_fixed(data_A, data_b, stddev=0.01, l=0.005, dtype=tf.float32, batch_size=128, x_init=None, train_size=1280, is_eval=False):
   """lasso problem: f(x) = 0.5*||Wx - y||2 + lamada *||x||1."""
   a = data_A.astype(np.float32)
   b = data_b.astype(np.float32)
@@ -149,25 +149,26 @@ def lasso_fixed(data_A, data_b, stddev=0.01, l=0.005, dtype=tf.float32, batch_si
     if x_init is not None:
       x = tf.get_variable(
           "x",
-          shape=[batch_size, a.shape[2]],
+          shape=[train_size, a.shape[2]],
           dtype=dtype,
           initializer=tf.constant_initializer(x_init))
     else:
       x = tf.get_variable(
           "x",
-          shape=[batch_size, a.shape[2]],
+          shape=[train_size, a.shape[2]],
           dtype=dtype,
           initializer=tf.random_normal_initializer(stddev=stddev))
 
     # Non-trainable variables.
-    indices = tf.get_variable("indices",
-                        shape=[batch_size],
-                        dtype=tf.int64,
-                        initializer=tf.random_uniform_initializer(0, a.shape[0], dtype=tf.int64),
-                        trainable=False)
-    w = tf.gather(a, indices)
-    y = tf.gather(b, indices)
-
+    if not is_eval:
+      indices = tf.random_uniform([batch_size], 0, train_size, tf.int64)
+      w = tf.gather(a, indices)
+      y = tf.gather(b, indices)
+      x = tf.gather(x, indices)
+    else:
+      w = a
+      y = b
+      
     # product = tf.squeeze(tf.matmul(w, tf.expand_dims(x, -1)))
     
     product = tf.matmul(w, tf.expand_dims(x, -1))
@@ -216,7 +217,7 @@ def rastrigin(batch_size=128, num_dims=10, alpha=10, stddev=1, dtype=tf.float32)
 
   return build
 
-def rastrigin_fixed(data_A, data_B, data_C, batch_size=128, num_dims=10, alpha=10, stddev=1, dtype=tf.float32, x_init=None):
+def rastrigin_fixed(data_A, data_B, data_C, batch_size=128, num_dims=10, alpha=10, stddev=1, dtype=tf.float32, x_init=None, train_size=1280, is_eval=False):
   
   data_A = data_A.astype(np.float32)
   data_B = data_B.astype(np.float32)
@@ -229,25 +230,26 @@ def rastrigin_fixed(data_A, data_B, data_C, batch_size=128, num_dims=10, alpha=1
     if x_init is not None:
       x = tf.get_variable(
           "x",
-          shape=[batch_size, num_dims, 1],
+          shape=[train_size, num_dims, 1],
           dtype=dtype,
           initializer=tf.constant_initializer(x_init))
     else:
       x = tf.get_variable(
           "x",
-          shape=[batch_size, num_dims, 1],
+          shape=[train_size, num_dims, 1],
           dtype=dtype,
           initializer=tf.random_normal_initializer(stddev=stddev))
-    
-    indices = tf.get_variable("indices",
-                        shape=[batch_size],
-                        dtype=tf.int64,
-                        initializer=tf.random_uniform_initializer(0, data_A.shape[0], dtype=tf.int64),
-                        trainable=False)
-    A = tf.gather(data_A, indices)
-    B = tf.gather(data_B, indices)
-    C = tf.gather(data_C, indices)
-
+    if not is_eval:
+      indices = tf.random_uniform([batch_size], 0, train_size, tf.int64)
+      A = tf.gather(data_A, indices)
+      B = tf.gather(data_B, indices)
+      C = tf.gather(data_C, indices)
+      x = tf.gather(x, indices)
+    else:
+      A = data_A
+      B = data_B
+      C = data_C
+      
     # Non-trainable variables.
     product = tf.matmul(A, x)
     ras_norm=tf.norm(product-B,ord=2,axis=[-2,-1])

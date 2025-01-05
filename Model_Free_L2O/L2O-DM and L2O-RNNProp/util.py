@@ -245,8 +245,10 @@ def get_config(problem_name, path=None, mode=None, num_hidden_layer=None, net_na
     }}
     net_assignments = None
   elif problem_name == "lasso-fixed-10-5":
-    data_A = np.load("/home/xuxi/Open-L2O/LASSO/5_0.005/train_Xys_10_0.005.npy")
-    problem = problems.lasso_fixed(data_A[:, :50].reshape(-1, 5, 10), data_A[:, 50:].reshape(-1, 5, 1), batch_size=128)
+    data_A = np.load("/home/xc4863/Open-L2O/L2O_NEW/datas/data/lasso/train_Xys_10_0.005.npy")
+    print(data_A.shape)
+    x = np.load("/home/xc4863/Open-L2O/L2O_NEW/datas/data/lasso/train_datas_10_0.005.npy")
+    problem = problems.lasso_fixed(data_A[:, :50].reshape(-1, 5, 10), data_A[:, 50:].reshape(-1, 5, 1), batch_size=128, x_init=x, train_size=6400)
 
     net_config = {"cw": {
         "net": "CoordinateWiseDeepLSTM",
@@ -255,9 +257,9 @@ def get_config(problem_name, path=None, mode=None, num_hidden_layer=None, net_na
     }}
     net_assignments = None
   elif problem_name == "lasso-fixed-10-5-test":
-    data_A = np.load("/home/xuxi/Open-L2O/LASSO/5_0.005/test_Xys_10_0.005.npy")
-    x = np.load("/home/xuxi/Open-L2O/LASSO/5_0.005/initpts_lasso.npy")
-    problem = problems.lasso_fixed(data_A[:, :50].reshape(-1, 5, 10), data_A[:, 50:].reshape(-1, 5, 1), x_init=x)
+    data_A = np.load("/home/xc4863/Open-L2O/L2O_NEW/datas/data/lasso/test_Xys_10_0.005.npy")
+    x = np.load("/home/xc4863/Open-L2O/L2O_NEW/datas/data/lasso/test_datas_10_0.005.npy")
+    problem = problems.lasso_fixed(data_A[:, :50].reshape(-1, 5, 10), data_A[:, 50:].reshape(-1, 5, 1), x_init=x, is_eval=True)
 
     net_config = {"cw": {
         "net": "CoordinateWiseDeepLSTM",
@@ -266,8 +268,9 @@ def get_config(problem_name, path=None, mode=None, num_hidden_layer=None, net_na
     }}
     net_assignments = None
   elif problem_name == "lasso-fixed-50-25":
-    data_A = np.load("/home/xuxi/Open-L2O/LASSO/25_0.005/train_Xys_50_0.005_en.npy")
-    problem = problems.lasso_fixed(data_A[:, :1250].reshape(-1, 25, 50), data_A[:, 50:].reshape(-1, 25, 1), batch_size=128)
+    data_A = np.load("/home/xc4863/Open-L2O/L2O_NEW/datas/data/lasso/train_Xys_50_0.005.npy")
+    x = np.load("/home/xc4863/Open-L2O/L2O_NEW/datas/data/lasso/train_datas_50_0.005.npy")
+    problem = problems.lasso_fixed(data_A[:, :1250].reshape(-1, 25, 50), data_A[:, 1250:].reshape(-1, 25, 1), batch_size=128, x_init=x, train_size=6400)
 
     net_config = {"cw": {
         "net": "CoordinateWiseDeepLSTM",
@@ -276,8 +279,10 @@ def get_config(problem_name, path=None, mode=None, num_hidden_layer=None, net_na
     }}
     net_assignments = None
   elif problem_name == "lasso-fixed-50-25-test":
-    data_A = np.load("/home/xuxi/Open-L2O/LASSO/25_0.005/test_Xys_50_0.005.npy")
-    problem = problems.lasso_fixed(data_A[:, :1250].reshape(-1, 25, 50), data_A[:, 50:].reshape(-1, 25, 1))
+    data_A = np.load("/home/xc4863/Open-L2O/L2O_NEW/datas/data/lasso/test_Xys_50_0.005.npy")
+    x = np.load("/home/xc4863/Open-L2O/L2O_NEW/datas/data/lasso/test_datas_50_0.005.npy")
+
+    problem = problems.lasso_fixed(data_A[:, :1250].reshape(-1, 25, 50), data_A[:, 1250:].reshape(-1, 25, 1), x_init=x, is_eval=True)
 
     net_config = {"cw": {
         "net": "CoordinateWiseDeepLSTM",
@@ -286,8 +291,20 @@ def get_config(problem_name, path=None, mode=None, num_hidden_layer=None, net_na
     }}
     net_assignments = None
   elif problem_name == "rastrigin-fixed-2":
-    data_A = np.load("/home/xuxi/Open-L2O/LASSO/5_0.005/train_Xys_10_0.005.npy")
-    problem = problems.rastrigin_fixed(data_A[:, :4].reshape(-1, 2, 2), data_A[:, 4:6].reshape(-1, 2, 1), data_A[:, 6:].reshape(-1, 2, 1), batch_size=128, num_dims=2)
+    data_A = np.load("/home/xc4863/Open-L2O/L2O_NEW/datas/data/rastrigin/train_Abcs_2_10.npy")
+    x = np.load("/home/xc4863/Open-L2O/L2O_NEW/datas/data/rastrigin/train_datas_2_10.npy")
+    problem = problems.rastrigin_fixed(data_A[:, :4].reshape(-1, 2, 2), data_A[:, 4:6].reshape(-1, 2, 1), data_A[:, 6:].reshape(-1, 2, 1), batch_size=128, num_dims=2, x_init=x, train_size=50)
+
+    net_config = {"cw": {
+        "net": "CoordinateWiseDeepLSTM",
+        "net_options": {"layers": (20, 20)},
+        "net_path": path
+    }}
+    net_assignments = None
+  elif problem_name == "rastrigin-fixed-2-test":
+    data_A = np.load("/home/xc4863/Open-L2O/L2O_NEW/datas/data/rastrigin/test_Abcs_2_10.npy")
+    x = np.load("/home/xc4863/Open-L2O/L2O_NEW/datas/data/rastrigin/test_datas_2_10.npy")
+    problem = problems.rastrigin_fixed(data_A[:, :4].reshape(-1, 2, 2), data_A[:, 4:6].reshape(-1, 2, 1), data_A[:, 6:].reshape(-1, 2, 1), batch_size=128, num_dims=2, x_init=x, is_eval=True)
 
     net_config = {"cw": {
         "net": "CoordinateWiseDeepLSTM",
